@@ -62,6 +62,7 @@
                 name="color"
                 v-bind:value="color.value"
                 checked=""
+                v-model="currentColorValue"
               />
               <span class="colors__value" v-bind:style="{'background-color': color.value}">
               </span>
@@ -185,9 +186,10 @@ export default {
       currentPriceFrom: 0,
       currentPriceTo: 0,
       currentCategoryId: 0,
+      currentColorValue: 0,
     };
   },
-  props: ['priceFrom', 'priceTo', 'categoryId'],
+  props: ['priceFrom', 'priceTo', 'categoryId', 'colorValue'],
   watch: {
     priceFrom(value) {
       this.currentPriceFrom = value;
@@ -212,11 +214,13 @@ export default {
       this.$emit('update:priceFrom', this.currentPriceFrom);
       this.$emit('update:priceTo', this.currentPriceTo);
       this.$emit('update:categoryId', this.currentCategoryId);
+      this.$emit('update:colorValue', this.currentColorValue);
     },
     clear() {
       this.$emit('update:priceFrom', 0);
       this.$emit('update:priceTo', 0);
       this.$emit('update:categoryId', 0);
+      this.$emit('update:colorValue', 0);
     },
   },
 };

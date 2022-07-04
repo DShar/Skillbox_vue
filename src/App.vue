@@ -10,6 +10,7 @@
         v-bind:priceFrom.sync="filterPriceFrom"
         v-bind:priceTo.sync="filterPriceTo"
         v-bind:categoryId.sync="filterCategoryId"
+        v-bind:colorValue.sync="filterColorValue"
       />
       <section class="catalog">
         <ProductsList v-bind:products="products" />
@@ -41,6 +42,7 @@ export default {
       filterPriceFrom: 0,
       filterPriceTo: 0,
       filterCategoryId: 0,
+      filterColorValue: 0,
 
       page: 1,
       productsPerPage: 4,
@@ -65,6 +67,12 @@ export default {
       if (this.filterCategoryId > 0) {
         filteredProducts = filteredProducts.filter(
           (product) => product.categoryId === this.filterCategoryId,
+        );
+      }
+
+      if (this.filterColorValue !== 0) {
+        filteredProducts = filteredProducts.filter(
+          (product) => product.colors && product.colors.includes(this.filterColorValue),
         );
       }
 
