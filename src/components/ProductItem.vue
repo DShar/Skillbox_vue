@@ -1,7 +1,6 @@
 <template>
     <div>
-            <a class="catalog__pic" href="#"
-              v-on:click.prevent="$emit('gotoPage','product', product.id)">
+            <a class="catalog__pic" href="#" v-on:click.prevent="gotoPage('product', product.id)">
               <img v-bind:src="product.image" alt="Название товара">
             </a>
 
@@ -28,12 +27,19 @@
 </template>
 
 <script>
+import EventBus from '@/eventBus';
+
 export default {
   data() {
     return {
     };
   },
   props: ['product'],
+  methods: {
+    gotoPage(pageName, pageParams) {
+      EventBus.$emit('gotoPage', pageName, pageParams);
+    },
+  },
 };
 </script>
 

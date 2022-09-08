@@ -13,8 +13,7 @@
         v-bind:colorValue.sync="filterColorValue"
       />
       <section class="catalog">
-        <ProductsList v-bind:products="products"
-          v-on:gotoPage="(pageName, pageParams)=> $emit('gotoPage', pageName, pageParams)"/>
+        <ProductsList v-bind:products="products"/>
         <BasePagination
           v-bind:count="countProducts"
           v-model="page"

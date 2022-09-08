@@ -1,12 +1,13 @@
 <template>
-  <component v-bind:is="currentPageComponent" v-bind:page-params="currentPageParams"
-    v-on:gotoPage="(pageName, pageParams)=> gotoPage(pageName, pageParams)"/>
+  <component v-bind:is="currentPageComponent" v-bind:page-params="currentPageParams"/>
 </template>
 
 <script>
 import MainPage from '@/pages/MainPage.vue';
 import ProductPage from '@/pages/ProductPage.vue';
 import NotFoundPage from '@/pages/NotFoundPage.vue';
+
+import EventBus from '@/eventBus';
 
 const routs = {
   main: 'MainPage',
@@ -26,6 +27,10 @@ export default {
       currentPage: 'main',
       currentPageParams: {},
     };
+  },
+
+  created() {
+    EventBus.$on('gotoPage', (pageName, pageParams) => this.gotoPage(pageName, pageParams));
   },
 
   methods: {
