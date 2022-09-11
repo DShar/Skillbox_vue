@@ -1,33 +1,34 @@
 <template>
     <div>
-            <a class="catalog__pic" href="#" v-on:click.prevent="gotoPage('product', product.id)">
-              <img v-bind:src="product.image" alt="Название товара">
-            </a>
+        <a class="catalog__pic" href="#" v-on:click.prevent="gotoPage('product', {id: product.id})">
+          <img v-bind:src="product.image" alt="Название товара">
+        </a>
 
-            <h3 class="catalog__title">
-              <a href="#">
-                {{product.title}}
-              </a>
-            </h3>
+        <h3 class="catalog__title">
+          <a href="#">
+            {{product.title}}
+          </a>
+        </h3>
 
-            <span class="catalog__price">
-              {{product.price}} ₽
-            </span>
+        <span class="catalog__price">
+          {{product.price | numberFormat}} ₽
+        </span>
 
-            <ul class="colors colors--black">
-              <li class="colors__item" v-for="color in product.colors" v-bind:key="color">
-                <label class="colors__label">
-                  <input class="colors__radio sr-only" type="radio" v-bind:value="color">
-                  <span class="colors__value" v-bind:style="{'background-color': color}">
-                  </span>
-                </label>
-              </li>
-            </ul>
+        <ul class="colors colors--black">
+          <li class="colors__item" v-for="color in product.colors" v-bind:key="color">
+            <label class="colors__label">
+              <input class="colors__radio sr-only" type="radio" v-bind:value="color">
+              <span class="colors__value" v-bind:style="{'background-color': color}">
+              </span>
+            </label>
+          </li>
+        </ul>
     </div>
 </template>
 
 <script>
-import EventBus from '@/eventBus';
+import gotoPage from '@/helpers/gotopage';
+import numberFormat from '@/helpers/numberFormat';
 
 export default {
   data() {
@@ -35,10 +36,11 @@ export default {
     };
   },
   props: ['product'],
+  filters: {
+    numberFormat,
+  },
   methods: {
-    gotoPage(pageName, pageParams) {
-      EventBus.$emit('gotoPage', pageName, pageParams);
-    },
+    gotoPage,
   },
 };
 </script>
