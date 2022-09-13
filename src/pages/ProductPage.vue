@@ -3,14 +3,14 @@
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
-          <a class="breadcrumbs__link" href="#" v-on:click.prevent="gotoPage('main', {})">
+          <router-link class="breadcrumbs__link" v-bind:to="{name:'main'}">
             Каталог
-          </a>
+          </router-link>
         </li>
         <li class="breadcrumbs__item">
-          <a class="breadcrumbs__link" href="#" v-on:click.prevent="gotoPage('main', {})">
+          <router-link class="breadcrumbs__link" v-bind:to="{name:'main'}">
             {{category.title}}
-          </a>
+          </router-link>
         </li>
         <li class="breadcrumbs__item">
           <a class="breadcrumbs__link">
@@ -189,7 +189,6 @@ import numberFormat from '@/helpers/numberFormat';
 import gotoPage from '@/helpers/gotopage';
 
 export default {
-  props: ['pageParams'],
   filters: {
     numberFormat,
   },
@@ -198,7 +197,7 @@ export default {
   },
   computed: {
     product() {
-      return products.find((product) => product.id === this.pageParams.id);
+      return products.find((product) => product.id === +this.$route.params.id);
     },
     category() {
       return categories.find((category) => category.id === this.product.categoryId);
