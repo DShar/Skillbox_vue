@@ -21,7 +21,7 @@ export default {
   props: ['amount'],
   methods: {
     changeAmount(value) {
-      this.$emit('update:amount', value);
+      this.$emit('change-amount', value);
     },
     increaseAmount() {
       this.changeAmount(this.amount + 1);

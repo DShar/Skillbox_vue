@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import products from '@/data/products';
 
 Vue.use(Vuex);
 
@@ -10,6 +11,16 @@ export default new Vuex.Store({
   getters: {
     countProducts(state) {
       return state.cartProducts.length;
+    },
+    cartProductsDetails(state) {
+      return state.cartProducts.map((item) => ({
+        ...item,
+        product: products.find((product) => product.id === item.productId),
+      }));
+    },
+    cartTotalPrice(state, getters) {
+      return getters.cartProductsDetails.reduce((acc, item) => acc
+        + item.product.price * item.amount, 0);
     },
   },
   mutations: {
@@ -25,10 +36,18 @@ export default new Vuex.Store({
         });
       }
     },
+    changeProductAmount(state, { productId, newAmount }) {
+      const item = state.cartProducts.find((product) => product.productId === productId);
+
+      item.amount = newAmount;
+    },
   },
   actions: {
     addProductToCart(context, { productId, amount }) {
       context.commit('addProduct', { productId, amount });
+    },
+    changeProductAmount(context, { productId, newAmount }) {
+      context.commit('changeProductAmount', { productId, newAmount });
     },
   },
 });

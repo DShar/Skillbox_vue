@@ -85,7 +85,7 @@
             </fieldset>
 
             <div class="item__row">
-              <AmountCounter v-bind:amount.sync="amount"/>
+              <AmountCounter v-bind:amount="amount" v-on:change-amount="changeAmount($event)"/>
 
               <button class="button button--primery" type="submit">
                 В корзину
@@ -191,6 +191,9 @@ export default {
     gotoPage,
     addToCart() {
       this.$store.dispatch('addProductToCart', { productId: this.product.id, amount: this.amount });
+    },
+    changeAmount(value) {
+      this.amount = value;
     },
   },
   computed: {
