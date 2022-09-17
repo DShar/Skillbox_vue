@@ -6,7 +6,7 @@
             </svg>
         </button>
 
-        <input type="text" v-model.number="amount" name="count">
+        <input type="text" v-model.number="currentAmount" name="count">
 
         <button type="button" aria-label="Добавить один товар" v-on:click.prevent="increaseAmount">
             <svg width="12" height="12" fill="currentColor">
@@ -19,6 +19,16 @@
 <script>
 export default {
   props: ['amount'],
+  computed: {
+    currentAmount: {
+      get() {
+        return this.amount;
+      },
+      set(value) {
+        this.changeAmount(value);
+      },
+    },
+  },
   methods: {
     changeAmount(value) {
       this.$emit('change-amount', value);

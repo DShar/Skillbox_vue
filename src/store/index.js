@@ -39,7 +39,12 @@ export default new Vuex.Store({
     changeProductAmount(state, { productId, newAmount }) {
       const item = state.cartProducts.find((product) => product.productId === productId);
 
-      item.amount = newAmount;
+      if (item) {
+        item.amount = newAmount;
+      }
+    },
+    deleteProduct(state, { productId }) {
+      state.cartProducts = state.cartProducts.filter((product) => product.productId !== productId);
     },
   },
   actions: {
@@ -48,6 +53,9 @@ export default new Vuex.Store({
     },
     changeProductAmount(context, { productId, newAmount }) {
       context.commit('changeProductAmount', { productId, newAmount });
+    },
+    deleteProductFromCart(context, { productId }) {
+      context.commit('deleteProduct', { productId });
     },
   },
 });

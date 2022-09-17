@@ -85,7 +85,7 @@
             </fieldset>
 
             <div class="item__row">
-              <AmountCounter v-bind:amount="amount" v-on:change-amount="changeAmount($event)"/>
+              <BaseCounter v-bind:amount="amount" v-on:change-amount="changeAmount($event)"/>
 
               <button class="button button--primery" type="submit">
                 В корзину
@@ -173,7 +173,7 @@ import products from '@/data/products';
 import categories from '@/data/categories';
 import numberFormat from '@/helpers/numberFormat';
 import gotoPage from '@/helpers/gotopage';
-import AmountCounter from '@/components/AmountCounter.vue';
+import BaseCounter from '@/components/BaseCounter.vue';
 
 export default {
   data() {
@@ -182,7 +182,7 @@ export default {
     };
   },
   components: {
-    AmountCounter,
+    BaseCounter,
   },
   filters: {
     numberFormat,
