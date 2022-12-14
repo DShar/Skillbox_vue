@@ -54,13 +54,13 @@
       <fieldset class="form__block">
         <legend class="form__legend">Цвет</legend>
         <ul class="colors">
-          <li class="colors__item" v-for="color in colors" v-bind:key="color.value">
+          <li class="colors__item" v-for="color in colors" v-bind:key="color.id">
             <label class="colors__label">
               <input
                 class="colors__radio sr-only"
                 type="radio"
                 name="color"
-                v-bind:value="color.value"
+                v-bind:value="color.id"
                 checked=""
                 v-model="currentColorValue"
               />
@@ -177,8 +177,8 @@
 </template>
 
 <script>
-import categories from '@/data/categories';
-import colors from '@/data/colors';
+import axios from 'axios';
+import { API_BASE_URL } from '@/config';
 
 export default {
   data() {
@@ -187,6 +187,9 @@ export default {
       currentPriceTo: 0,
       currentCategoryId: 0,
       currentColorValue: 0,
+
+      categoriesData: null,
+      colorsData: null,
     };
   },
   props: ['priceFrom', 'priceTo', 'categoryId', 'colorValue'],
@@ -203,10 +206,13 @@ export default {
   },
   computed: {
     categories() {
-      return categories;
+      return this.categoriesData ? this.categoriesData.items : [];
     },
     colors() {
-      return colors;
+      return this.colorsData ? this.colorsData.items.map((color) => ({
+        ...color,
+        value: color.code,
+      })) : [];
     },
   },
   methods: {
@@ -222,6 +228,24 @@ export default {
       this.$emit('update:categoryId', 0);
       this.$emit('update:colorValue', 0);
     },
+    loadCategories() {
+      axios
+        .get(`${API_BASE_URL}/api/productCategories`)
+        .then((response) => {
+          this.categoriesData = response.data;
+        });
+    },
+    loadColors() {
+      axios
+        .get(`${API_BASE_URL}/api/colors`)
+        .then((response) => {
+          this.colorsData = response.data;
+        });
+    },
+  },
+  created() {
+    this.loadCategories();
+    this.loadColors();
   },
 };
 </script>

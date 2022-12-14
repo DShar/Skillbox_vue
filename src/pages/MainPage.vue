@@ -25,11 +25,11 @@
 </template>
 
 <script>
-import products from '@/data/products';
 import ProductsList from '@/components/ProductsList.vue';
 import BasePagination from '@/components/BasePagination.vue';
 import ProductFilter from '@/components/ProductFilter.vue';
 import axios from 'axios';
+import { API_BASE_URL } from '@/config';
 
 export default {
   components: {
@@ -51,52 +51,48 @@ export default {
     };
   },
   computed: {
-    filteredProducts() {
-      let filteredProducts = products;
-
-      if (this.filterPriceFrom > 0) {
-        filteredProducts = filteredProducts.filter(
-          (product) => product.price > this.filterPriceFrom,
-        );
-      }
-
-      if (this.filterPriceTo > 0) {
-        filteredProducts = filteredProducts.filter(
-          (product) => product.price < this.filterPriceTo,
-        );
-      }
-
-      if (this.filterCategoryId > 0) {
-        filteredProducts = filteredProducts.filter(
-          (product) => product.categoryId === this.filterCategoryId,
-        );
-      }
-
-      if (this.filterColorValue !== 0) {
-        filteredProducts = filteredProducts.filter(
-          (product) => product.colors && product.colors.includes(this.filterColorValue),
-        );
-      }
-
-      return filteredProducts;
-    },
     products() {
-      // const offset = (this.page - 1) * this.productsPerPage;
-      // return this.filteredProducts.slice(offset, offset + this.productsPerPage);
       return this.productsData ? this.productsData.items.map((product) => ({
         ...product,
         image: product.image.file.url,
+        colors: product.colors.map((color) => color.code),
       })) : [];
     },
     countProducts() {
-      return this.filteredProducts.length;
+      return this.productsData ? this.productsData.pagination.total : 0;
     },
   },
   methods: {
     loadProducts() {
       axios
-        .get('https://vue-study.skillbox.cc/api/products?page=1&limit=5')
+        .get(`${API_BASE_URL}/api/products`, {
+          params: {
+            page: this.page,
+            limit: this.productsPerPage,
+            categoryId: this.filterCategoryId,
+            minPrice: this.filterPriceFrom,
+            maxPrice: this.filterPriceTo,
+            colorId: this.filterColorValue,
+          },
+        })
         .then((response) => { this.productsData = response.data; });
+    },
+  },
+  watch: {
+    page() {
+      this.loadProducts();
+    },
+    filterCategoryId() {
+      this.loadProducts();
+    },
+    filterPriceFrom() {
+      this.loadProducts();
+    },
+    filterPriceTo() {
+      this.loadProducts();
+    },
+    filterColorValue() {
+      this.loadProducts();
     },
   },
   created() {
