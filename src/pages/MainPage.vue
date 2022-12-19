@@ -13,7 +13,13 @@
         v-bind:colorValue.sync="filterColorValue"
       />
       <section class="catalog">
-        <ProductsList v-bind:products="products"/>
+        <div v-if="productsLoadingFailed" class="content__title">
+          Ошибка при загрузке каталога
+          <a class="error__link" href="#" v-on:click.prevent="loadProducts">Попробовать ещё раз</a>
+        </div>
+        <div v-if="productsLoading" class="loader"></div>
+
+        <ProductsList v-else v-bind:products="products"/>
         <BasePagination
           v-bind:count="countProducts"
           v-model="page"
@@ -45,9 +51,12 @@ export default {
       filterColorValue: 0,
 
       page: 1,
-      productsPerPage: 4,
+      productsPerPage: 3,
 
       productsData: null,
+
+      productsLoading: false,
+      productsLoadingFailed: false,
     };
   },
   computed: {
@@ -64,18 +73,26 @@ export default {
   },
   methods: {
     loadProducts() {
-      axios
-        .get(`${API_BASE_URL}/api/products`, {
-          params: {
-            page: this.page,
-            limit: this.productsPerPage,
-            categoryId: this.filterCategoryId,
-            minPrice: this.filterPriceFrom,
-            maxPrice: this.filterPriceTo,
-            colorId: this.filterColorValue,
-          },
-        })
-        .then((response) => { this.productsData = response.data; });
+      this.productsLoading = true;
+      this.productsLoadingFailed = false;
+
+      clearTimeout(this.loadProductsTimer);
+      this.loadProductsTimer = setTimeout(() => {
+        axios
+          .get(`${API_BASE_URL}/api/products`, {
+            params: {
+              page: this.page,
+              limit: this.productsPerPage,
+              categoryId: this.filterCategoryId,
+              minPrice: this.filterPriceFrom,
+              maxPrice: this.filterPriceTo,
+              colorId: this.filterColorValue,
+            },
+          })
+          .then((response) => { this.productsData = response.data; })
+          .catch(() => { this.productsLoadingFailed = true; })
+          .finally(() => { this.productsLoading = false; });
+      }, 0);
     },
   },
   watch: {
