@@ -1,22 +1,32 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import products from '@/data/products';
+import axios from 'axios';
+import { API_BASE_URL } from '@/config';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
     cartProducts: [],
+
+    cartProductsData: [],
+    userAccessKey: null,
   },
   getters: {
     countProducts(state) {
       return state.cartProducts.length;
     },
     cartProductsDetails(state) {
-      return state.cartProducts.map((item) => ({
-        ...item,
-        product: products.find((product) => product.id === item.productId),
-      }));
+      return state.cartProducts.map((item) => {
+        const { product } = state.cartProductsData.find((p) => (p.product.id === item.productId));
+        return {
+          ...item,
+          product: {
+            ...product,
+            image: product.image.file.url,
+          },
+        };
+      });
     },
     cartTotalPrice(state, getters) {
       return getters.cartProductsDetails.reduce((acc, item) => acc
@@ -46,6 +56,19 @@ export default new Vuex.Store({
     deleteProduct(state, { productId }) {
       state.cartProducts = state.cartProducts.filter((product) => product.productId !== productId);
     },
+
+    updateUserAccessKey(state, key) {
+      state.userAccessKey = key;
+    },
+    updateCartProductsData(state, items) {
+      state.cartProductsData = items;
+    },
+    syncCartProducts(state) {
+      state.cartProducts = state.cartProductsData.map((item) => ({
+        productId: item.product.id,
+        amount: item.quantity,
+      }));
+    },
   },
   actions: {
     addProductToCart(context, { productId, amount }) {
@@ -56,6 +79,25 @@ export default new Vuex.Store({
     },
     deleteProductFromCart(context, { productId }) {
       context.commit('deleteProduct', { productId });
+    },
+    setUserAccessKey(context, accessKey) {
+      context.commit('updateUserAccessKey', accessKey);
+    },
+    loadCart(context) {
+      axios
+        .get(`${API_BASE_URL}/api/baskets`, {
+          params: {
+            userAccessKey: context.state.userAccessKey,
+          },
+        })
+        .then((response) => {
+          if (!context.state.userAccessKey) {
+            localStorage.setItem('userAccessKey', response.data.user.accessKey);
+            context.commit('updateUserAccessKey', response.data.user.accessKey);
+          }
+          context.commit('updateCartProductsData', response.data.items);
+          context.commit('syncCartProducts');
+        });
     },
   },
 });

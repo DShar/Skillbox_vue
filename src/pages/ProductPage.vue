@@ -1,5 +1,5 @@
 <template>
-  <main class="content container">
+  <main class="content container" v-if="productData">
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
@@ -42,10 +42,10 @@
             <fieldset class="form__block">
               <legend class="form__legend">Цвет:</legend>
               <ul class="colors">
-                <li class="colors__item" v-for="color in product.colors" v-bind:key="color">
+                <li class="colors__item" v-for="color in product.colors" v-bind:key="color.id">
                   <label class="colors__label">
-                    <input class="colors__radio sr-only" type="radio" v-bind:value="color">
-                    <span class="colors__value" v-bind:style="{'background-color': color}">
+                    <input class="colors__radio sr-only" type="radio" v-bind:value="color.id">
+                    <span class="colors__value" v-bind:style="{'background-color': color.code}">
                     </span>
                   </label>
                 </li>
@@ -166,19 +166,29 @@
       </div>
     </section>
   </main>
+  <main v-else-if="productLoading" class="loader">
+  </main>
+  <main v-else-if="productLoadingError" class="content__title">
+    Ошибка при загрузке товара
+    <a class="error__link" href="#" v-on:click.prevent="loadProduct">Попробовать ещё раз</a>
+  </main>
 </template>
 
 <script>
-import products from '@/data/products';
-import categories from '@/data/categories';
 import numberFormat from '@/helpers/numberFormat';
 import gotoPage from '@/helpers/gotopage';
 import BaseCounter from '@/components/BaseCounter.vue';
+import { API_BASE_URL } from '@/config';
+import axios from 'axios';
 
 export default {
   data() {
     return {
       amount: 1,
+
+      productData: null,
+      productLoading: false,
+      productLoadingError: false,
     };
   },
   components: {
@@ -186,6 +196,17 @@ export default {
   },
   filters: {
     numberFormat,
+  },
+  computed: {
+    product() {
+      return {
+        ...this.productData,
+        image: this.productData.image.file.url,
+      };
+    },
+    category() {
+      return this.productData.category;
+    },
   },
   methods: {
     gotoPage,
@@ -195,13 +216,23 @@ export default {
     changeAmount(value) {
       this.amount = value;
     },
-  },
-  computed: {
-    product() {
-      return products.find((product) => product.id === +this.$route.params.id);
+    loadProduct() {
+      this.productLoading = true;
+      this.productLoadingError = false;
+
+      axios
+        .get(`${API_BASE_URL}/api/products/${this.$route.params.id}`)
+        .then((response) => { this.productData = response.data; })
+        .catch(() => { this.productLoadingError = true; })
+        .finally(() => { this.productLoading = false; });
     },
-    category() {
-      return categories.find((category) => category.id === this.product.categoryId);
+  },
+  watch: {
+    'this.$route.params.id': {
+      handler() {
+        this.loadProduct();
+      },
+      immediate: true,
     },
   },
 };
