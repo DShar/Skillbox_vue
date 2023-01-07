@@ -1,0 +1,77 @@
+<template>
+  <main v-if="cartProductsLoading" class="loader">
+  </main>
+  <main v-else class="content container">
+    <div class="content__top">
+      <ul class="breadcrumbs">
+        <li class="breadcrumbs__item">
+          <a class="breadcrumbs__link" href="index.html">
+            Каталог
+          </a>
+        </li>
+        <li class="breadcrumbs__item">
+          <a class="breadcrumbs__link">
+            Корзина
+          </a>
+        </li>
+      </ul>
+
+      <h1 class="content__title">
+        Корзина
+      </h1>
+      <span class="content__info">
+        Товаров: {{ countProducts }}
+      </span>
+    </div>
+
+    <p v-show="!products.length">
+      <i>Добавьте товары в корзину</i>
+    </p>
+
+    <section class="cart">
+      <form class="cart__form form" action="#" method="POST">
+        <div class="cart__field">
+          <ul class="cart__list">
+            <CartProduct v-for="item in products" v-bind:key="item.productId"
+              v-bind:item="item"/>
+          </ul>
+        </div>
+
+        <div class="cart__block">
+          <p class="cart__desc">
+            Мы&nbsp;посчитаем стоимость доставки на&nbsp;следующем этапе
+          </p>
+          <p class="cart__price">
+            Итого: <span>{{ cartTotalPrice | numberFormat }} ₽</span>
+          </p>
+
+          <button class="cart__button button button--primery" type="submit">
+            Оформить заказ
+          </button>
+        </div>
+      </form>
+    </section>
+  </main>
+</template>
+
+<script>
+import { mapGetters, mapState } from 'vuex';
+import numberFormat from '@/helpers/numberFormat';
+import CartProduct from '@/components/CartProduct.vue';
+
+export default {
+  components: {
+    CartProduct,
+  },
+  filters: {
+    numberFormat,
+  },
+  computed: {
+    ...mapGetters(['countProducts', 'cartTotalPrice']),
+    ...mapGetters({ products: 'cartProductsDetails' }),
+    ...mapState({
+      cartProductsLoading: (state) => (state.cartProductsLoading),
+    }),
+  },
+};
+</script>

@@ -1,16 +1,16 @@
 <template>
-  <main class="content container">
+  <main class="content container" v-if="productData">
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
-          <a class="breadcrumbs__link" href="#" v-on:click.prevent="gotoPage('main', {})">
+          <router-link class="breadcrumbs__link" v-bind:to="{name:'main'}">
             Каталог
-          </a>
+          </router-link>
         </li>
         <li class="breadcrumbs__item">
-          <a class="breadcrumbs__link" href="#" v-on:click.prevent="gotoPage('main', {})">
+          <router-link class="breadcrumbs__link" v-bind:to="{name:'main'}">
             {{category.title}}
-          </a>
+          </router-link>
         </li>
         <li class="breadcrumbs__item">
           <a class="breadcrumbs__link">
@@ -34,7 +34,7 @@
           {{product.title}}
         </h2>
         <div class="item__form">
-          <form class="form" action="#" method="POST">
+          <form class="form" action="#" method="POST" v-on:submit.prevent="addToCart">
             <b class="item__price">
               {{product.price | numberFormat}} ₽
             </b>
@@ -42,10 +42,10 @@
             <fieldset class="form__block">
               <legend class="form__legend">Цвет:</legend>
               <ul class="colors">
-                <li class="colors__item" v-for="color in product.colors" v-bind:key="color">
+                <li class="colors__item" v-for="color in product.colors" v-bind:key="color.id">
                   <label class="colors__label">
-                    <input class="colors__radio sr-only" type="radio" v-bind:value="color">
-                    <span class="colors__value" v-bind:style="{'background-color': color}">
+                    <input class="colors__radio sr-only" type="radio" v-bind:value="color.id">
+                    <span class="colors__value" v-bind:style="{'background-color': color.code}">
                     </span>
                   </label>
                 </li>
@@ -85,21 +85,7 @@
             </fieldset>
 
             <div class="item__row">
-              <div class="form__counter">
-                <button type="button" aria-label="Убрать один товар">
-                  <svg width="12" height="12" fill="currentColor">
-                    <use xlink:href="#icon-minus"></use>
-                  </svg>
-                </button>
-
-                <input type="text" value="1" name="count">
-
-                <button type="button" aria-label="Добавить один товар">
-                  <svg width="12" height="12" fill="currentColor">
-                    <use xlink:href="#icon-plus"></use>
-                  </svg>
-                </button>
-              </div>
+              <BaseCounter v-bind:amount="amount" v-on:change-amount="changeAmount($event)"/>
 
               <button class="button button--primery" type="submit">
                 В корзину
@@ -180,28 +166,73 @@
       </div>
     </section>
   </main>
+  <main v-else-if="productLoading" class="loader">
+  </main>
+  <main v-else-if="productLoadingError" class="content__title">
+    Ошибка при загрузке товара
+    <a class="error__link" href="#" v-on:click.prevent="loadProduct">Попробовать ещё раз</a>
+  </main>
 </template>
 
 <script>
-import products from '@/data/products';
-import categories from '@/data/categories';
 import numberFormat from '@/helpers/numberFormat';
 import gotoPage from '@/helpers/gotopage';
+import BaseCounter from '@/components/BaseCounter.vue';
+import { API_BASE_URL } from '@/config';
+import axios from 'axios';
 
 export default {
-  props: ['pageParams'],
+  data() {
+    return {
+      amount: 1,
+
+      productData: null,
+      productLoading: false,
+      productLoadingError: false,
+    };
+  },
+  components: {
+    BaseCounter,
+  },
   filters: {
     numberFormat,
   },
-  methods: {
-    gotoPage,
-  },
   computed: {
     product() {
-      return products.find((product) => product.id === this.pageParams.id);
+      return {
+        ...this.productData,
+        image: this.productData.image.file.url,
+      };
     },
     category() {
-      return categories.find((category) => category.id === this.product.categoryId);
+      return this.productData.category;
+    },
+  },
+  methods: {
+    gotoPage,
+    addToCart() {
+      this.$store.dispatch('addProductToCart', { productId: this.product.id, amount: this.amount });
+    },
+    changeAmount(value) {
+      this.amount = value;
+    },
+    loadProduct() {
+      this.productLoading = true;
+      this.productLoadingError = false;
+
+      axios
+        .get(`${API_BASE_URL}/api/products/${this.$route.params.id}`)
+        .then((response) => { this.productData = response.data; })
+        .catch(() => { this.productLoadingError = true; })
+        .finally(() => { this.productLoading = false; });
+    },
+  },
+  watch: {
+    'this.$route.params.id': {
+      handler() {
+        this.loadProduct();
+      },
+      immediate: true,
     },
   },
 };

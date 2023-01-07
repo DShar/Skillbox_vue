@@ -1,13 +1,13 @@
 <template>
     <div>
-        <a class="catalog__pic" href="#" v-on:click.prevent="gotoPage('product', {id: product.id})">
+        <router-link class="catalog__pic" v-bind:to="{name:'product', params: { id: product.id }}">
           <img v-bind:src="product.image" alt="Название товара">
-        </a>
+        </router-link>
 
         <h3 class="catalog__title">
-          <a href="#">
+          <router-link v-bind:to="{name:'product', params: { id: product.id }}">
             {{product.title}}
-          </a>
+          </router-link>
         </h3>
 
         <span class="catalog__price">
