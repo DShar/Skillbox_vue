@@ -8,19 +8,3 @@
     </div>
 </main>
 </template>
-
-<style>
-.return__link {
-    font-family: "PressStart";
-    font-size: 16px;
-    line-height: 24px;
-    color: #9eff00;
-    border-bottom: 2px dashed transparent;
-    -webkit-transition: all .2s ease;
-    transition: all .2s ease;
-}
-
-.return__link:hover {
-    color: #000;
-}
-</style>
