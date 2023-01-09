@@ -91,25 +91,23 @@ export default new Vuex.Store({
     loadCart(context) {
       context.commit('setCartProductsLoading', true);
 
-      setTimeout(() => {
-        axios
-          .get(`${API_BASE_URL}/api/baskets`, {
-            params: {
-              userAccessKey: context.state.userAccessKey,
-            },
-          })
-          .then((response) => {
-            if (!context.state.userAccessKey) {
-              localStorage.setItem('userAccessKey', response.data.user.accessKey);
-              context.commit('updateUserAccessKey', response.data.user.accessKey);
-            }
-            context.commit('updateCartProductsData', response.data.items);
-            context.commit('syncCartProducts');
-          })
-          .finally(() => {
-            context.commit('setCartProductsLoading', false);
-          });
-      }, 5000);
+      axios
+        .get(`${API_BASE_URL}/api/baskets`, {
+          params: {
+            userAccessKey: context.state.userAccessKey,
+          },
+        })
+        .then((response) => {
+          if (!context.state.userAccessKey) {
+            localStorage.setItem('userAccessKey', response.data.user.accessKey);
+            context.commit('updateUserAccessKey', response.data.user.accessKey);
+          }
+          context.commit('updateCartProductsData', response.data.items);
+          context.commit('syncCartProducts');
+        })
+        .finally(() => {
+          context.commit('setCartProductsLoading', false);
+        });
     },
   },
 });
