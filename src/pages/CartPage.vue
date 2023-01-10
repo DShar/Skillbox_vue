@@ -1,7 +1,5 @@
 <template>
-  <main v-if="cartProductsLoading" class="loader">
-  </main>
-  <main v-else class="content container">
+  <main class="content container">
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
@@ -24,15 +22,17 @@
       </span>
     </div>
 
-    <p v-show="!products.length">
-      <i>Добавьте товары в корзину</i>
-    </p>
+    <section v-if="cartProductsLoading" class="loader">
+    </section>
 
-    <section class="cart">
+    <section v-else class="cart">
+      <p v-show="!cartProductsDetails.length">
+        <i>Добавьте товары в корзину</i>
+      </p>
       <form class="cart__form form" action="#" method="POST">
         <div class="cart__field">
           <ul class="cart__list">
-            <CartProduct v-for="item in products" v-bind:key="item.productId"
+            <CartProduct v-for="item in cartProductsDetails" v-bind:key="item.productId"
               v-bind:item="item"/>
           </ul>
         </div>
@@ -67,8 +67,8 @@ export default {
     numberFormat,
   },
   computed: {
-    ...mapGetters(['countProducts', 'cartTotalPrice']),
-    ...mapGetters({ products: 'cartProductsDetails' }),
+    ...mapGetters(['countProducts', 'cartTotalPrice', 'cartProductsDetails']),
+
     ...mapState({
       cartProductsLoading: (state) => (state.cartProductsLoading),
     }),
