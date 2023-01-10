@@ -108,6 +108,7 @@ export default new Vuex.Store({
         .finally(() => {
           context.commit('setCartProductsLoading', false);
         });
+
     },
   },
 });

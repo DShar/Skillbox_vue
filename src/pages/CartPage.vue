@@ -68,6 +68,7 @@ export default {
   },
   computed: {
     ...mapGetters(['countProducts', 'cartTotalPrice', 'cartProductsDetails']),
+
     ...mapState({
       cartProductsLoading: (state) => (state.cartProductsLoading),
     }),
