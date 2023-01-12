@@ -36,18 +36,6 @@ export default new Vuex.Store({
     },
   },
   mutations: {
-    addProduct(state, payload) {
-      const item = state.cartProducts.find((product) => product.productId === payload.productId);
-
-      if (item) {
-        item.amount += payload.amount;
-      } else {
-        state.cartProducts.push({
-          productId: payload.productId,
-          amount: payload.amount,
-        });
-      }
-    },
     changeProductAmount(state, { productId, newAmount }) {
       const item = state.cartProducts.find((product) => product.productId === productId);
 
@@ -77,7 +65,20 @@ export default new Vuex.Store({
   },
   actions: {
     addProductToCart(context, { productId, amount }) {
-      context.commit('addProduct', { productId, amount });
+      return axios
+        .post(`${API_BASE_URL}/api/baskets/products`, {
+          productId,
+          quantity: amount,
+        },
+        {
+          params: {
+            userAccessKey: context.state.userAccessKey,
+          },
+        })
+        .then((response) => {
+          context.commit('updateCartProductsData', response.data.items);
+          context.commit('syncCartProducts');
+        });
     },
     changeProductAmount(context, { productId, newAmount }) {
       context.commit('changeProductAmount', { productId, newAmount });
@@ -108,7 +109,6 @@ export default new Vuex.Store({
         .finally(() => {
           context.commit('setCartProductsLoading', false);
         });
-
     },
   },
 });

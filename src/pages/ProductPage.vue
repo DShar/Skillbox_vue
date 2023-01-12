@@ -87,10 +87,16 @@
             <div class="item__row">
               <BaseCounter v-bind:amount="amount" v-on:change-amount="changeAmount($event)"/>
 
-              <button class="button button--primery" type="submit">
+              <button class="button button--primery" type="submit" v-bind:disabled="productSending">
                 В корзину
               </button>
             </div>
+            <span v-show="productAdded">
+              Товар добавлен в корзину
+            </span>
+            <span v-show="productSending">
+              Идёт добавление товара в корзину...
+            </span>
           </form>
         </div>
       </div>
@@ -180,6 +186,7 @@ import gotoPage from '@/helpers/gotopage';
 import BaseCounter from '@/components/BaseCounter.vue';
 import { API_BASE_URL } from '@/config';
 import axios from 'axios';
+import { mapActions } from 'vuex';
 
 export default {
   data() {
@@ -189,6 +196,9 @@ export default {
       productData: null,
       productLoading: false,
       productLoadingError: false,
+
+      productAdded: false,
+      productSending: false,
     };
   },
   components: {
@@ -209,9 +219,18 @@ export default {
     },
   },
   methods: {
+    ...mapActions(['addProductToCart']),
     gotoPage,
     addToCart() {
-      this.$store.dispatch('addProductToCart', { productId: this.product.id, amount: this.amount });
+      this.productSending = true;
+
+      this.addProductToCart({ productId: this.product.id, amount: this.amount })
+        .then(() => {
+          this.productAdded = true;
+        })
+        .finally(() => {
+          this.productSending = false;
+        });
     },
     changeAmount(value) {
       this.amount = value;
