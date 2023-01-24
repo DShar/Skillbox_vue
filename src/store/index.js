@@ -82,9 +82,44 @@ export default new Vuex.Store({
     },
     changeProductAmount(context, { productId, newAmount }) {
       context.commit('changeProductAmount', { productId, newAmount });
+
+      if (newAmount < 1) {
+        return {};
+      }
+
+      return axios
+        .put(`${API_BASE_URL}/api/baskets/products`, {
+          productId,
+          quantity: newAmount,
+        },
+        {
+          params: {
+            userAccessKey: context.state.userAccessKey,
+          },
+        })
+        .then((response) => {
+          context.commit('updateCartProductsData', response.data.items);
+        })
+        .catch(() => {
+          context.commit('syncCartProducts');
+        });
     },
     deleteProductFromCart(context, { productId }) {
       context.commit('deleteProduct', { productId });
+
+      return axios
+        .delete(`${API_BASE_URL}/api/baskets/products`, {
+          params: {
+            userAccessKey: context.state.userAccessKey,
+          },
+          data: { productId },
+        })
+        .then((response) => {
+          context.commit('updateCartProductsData', response.data.items);
+        })
+        .catch(() => {
+          context.commit('syncCartProducts');
+        });
     },
     setUserAccessKey(context, accessKey) {
       context.commit('updateUserAccessKey', accessKey);
