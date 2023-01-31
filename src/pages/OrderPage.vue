@@ -23,7 +23,7 @@
         Корзина
       </h1>
       <span class="content__info">
-        3 товара
+        Товаров: {{ countProducts }}
       </span>
     </div>
 
@@ -31,36 +31,20 @@
       <form class="cart__form form" action="#" method="POST">
         <div class="cart__field">
           <div class="cart__data">
-            <label class="form__label">
-              <input class="form__input" type="text" name="name"
-                placeholder="Введите ваше полное имя">
-              <span class="form__value">ФИО</span>
-            </label>
+            <BaseFormText title="ФИО" v-bind:error="formError.name"
+              v-model="formData.name" placeholder="Введите ваше полное имя"/>
 
-            <label class="form__label">
-              <input class="form__input" type="text" name="address"
-                placeholder="Введите ваш адрес">
-              <span class="form__value">Адрес доставки</span>
-            </label>
+            <BaseFormText title="Адрес доставки" v-bind:error="formError.address"
+              v-model="formData.address" placeholder="Введите ваш адрес"/>
 
-            <label class="form__label">
-              <input class="form__input" type="tel" name="phone"
-                placeholder="Введите ваш телефон">
-              <span class="form__value">Телефон</span>
-              <span class="form__error">Неверный формат телефона</span>
-            </label>
+            <BaseFormText title="Телефон" v-bind:error="formError.phone"
+              v-model="formData.phone" placeholder="Введите ваш телефон" type="tel"/>
 
-            <label class="form__label">
-              <input class="form__input" type="email" name="email"
-                placeholder="Введи ваш Email">
-              <span class="form__value">Email</span>
-            </label>
+            <BaseFormText title="Email" v-bind:error="formError.email"
+              v-model="formData.email" placeholder="Введите ваш Email" type="email"/>
 
-            <label class="form__label">
-              <textarea class="form__input form__input--area" name="comments"
-                placeholder="Ваши пожелания"></textarea>
-              <span class="form__value">Комментарий к заказу</span>
-            </label>
+            <BaseFormTextarea title="Комментарий к заказу" v-model="formData.comments"
+              v-bind:error="formError.comments" placeholder="Ваши пожелания"/>
           </div>
 
           <div class="cart__options">
@@ -109,26 +93,15 @@
 
         <div class="cart__block">
           <ul class="cart__orders">
-            <li class="cart__order">
-              <h3>Смартфон Xiaomi Redmi Note 7 Pro 6/128GB</h3>
-              <b>18 990 ₽</b>
-              <span>Артикул: 150030</span>
-            </li>
-            <li class="cart__order">
-              <h3>Гироскутер Razor Hovertrax 2.0ii</h3>
-              <b>4 990 ₽</b>
-              <span>Артикул: 150030</span>
-            </li>
-            <li class="cart__order">
-              <h3>Электрический дрифт-карт Razor Lil’ Crazy</h3>
-              <b>8 990 ₽</b>
-              <span>Артикул: 150030</span>
-            </li>
+            <OrderProduct v-for="item in cartProductsDetails" v-bind:key="item.productId"
+              v-bind:item="item"/>
           </ul>
 
           <div class="cart__total">
             <p>Доставка: <b>500 ₽</b></p>
-            <p>Итого: <b>3</b> товара на сумму <b>37 970 ₽</b></p>
+            <p>Итого: <b>{{ countProducts }}</b> товара на сумму <b>
+              {{ cartTotalPrice | numberFormat }} ₽</b>
+            </p>
           </div>
 
           <button class="cart__button button button--primery" type="submit">
@@ -147,11 +120,29 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+import BaseFormText from '@/components/BaseFormText.vue';
+import BaseFormTextarea from '@/components/BaseFormTextarea.vue';
+import OrderProduct from '@/components/OrderProduct.vue';
+import numberFormat from '@/helpers/numberFormat';
+
 export default {
+  components: {
+    BaseFormText,
+    BaseFormTextarea,
+    OrderProduct,
+  },
+  filters: {
+    numberFormat,
+  },
   data() {
     return {
       formData: {},
+      formError: {},
     };
+  },
+  computed: {
+    ...mapGetters(['countProducts', 'cartTotalPrice', 'cartProductsDetails']),
   },
 };
 </script>
