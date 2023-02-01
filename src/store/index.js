@@ -62,6 +62,10 @@ export default new Vuex.Store({
     setCartProductsLoading(state, value) {
       state.cartProductsLoading = value;
     },
+    resetCart(state) {
+      state.cartProducts = [];
+      state.cartProductsData = [];
+    },
   },
   actions: {
     addProductToCart(context, { productId, amount }) {
@@ -127,7 +131,7 @@ export default new Vuex.Store({
     loadCart(context) {
       context.commit('setCartProductsLoading', true);
 
-      axios
+      return axios
         .get(`${API_BASE_URL}/api/baskets`, {
           params: {
             userAccessKey: context.state.userAccessKey,
@@ -144,6 +148,9 @@ export default new Vuex.Store({
         .finally(() => {
           context.commit('setCartProductsLoading', false);
         });
+    },
+    resetCart(context) {
+      context.commit('resetCart');
     },
   },
 });
