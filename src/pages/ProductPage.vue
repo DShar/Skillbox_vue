@@ -239,7 +239,7 @@ export default {
       this.productLoading = true;
       this.productLoadingError = false;
 
-      axios
+      return axios
         .get(`${API_BASE_URL}/api/products/${this.$route.params.id}`)
         .then((response) => { this.productData = response.data; })
         .catch(() => { this.productLoadingError = true; })

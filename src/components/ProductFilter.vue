@@ -229,14 +229,14 @@ export default {
       this.$emit('update:colorValue', 0);
     },
     loadCategories() {
-      axios
+      return axios
         .get(`${API_BASE_URL}/api/productCategories`)
         .then((response) => {
           this.categoriesData = response.data;
         });
     },
     loadColors() {
-      axios
+      return axios
         .get(`${API_BASE_URL}/api/colors`)
         .then((response) => {
           this.colorsData = response.data;
